@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Discord-MCP 助理 — 使用指南</title>
+<meta name="description" content="ChatGPT × Discord 助理使用指南。整理對話、找資訊、草擬回覆。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-subtle:#fafafa;
+    --bg-elevated:#f7f7f8;
+    --text:#0a0a0a;
+    --text-2:#3f3f46;
+    --text-muted:#71717a;
+    --border:#e4e4e7;
+    --border-strong:#d4d4d8;
+    --accent:#5e6ad2;
+    --accent-soft:#eef0ff;
+    --warn-bg:#fff8e6;
+    --warn-border:#f5d77a;
+    --warn-text:#7a5b00;
+    --code-bg:#f4f4f5;
+    --discord:#5865f2;
+    --radius:10px;
+    --radius-sm:6px;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;
+    --mono:'JetBrains Mono','SF Mono',Menlo,Monaco,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0c0c0d;
+      --bg-subtle:#121214;
+      --bg-elevated:#18181b;
+      --text:#fafafa;
+      --text-2:#d4d4d8;
+      --text-muted:#a1a1aa;
+      --border:#27272a;
+      --border-strong:#3f3f46;
+      --accent:#8a93f0;
+      --accent-soft:#1c1f3a;
+      --warn-bg:#2a2210;
+      --warn-border:#5a4a1a;
+      --warn-text:#f5d77a;
+      --code-bg:#18181b;
+    }
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.65;letter-spacing:-0.005em}
+  body{text-rendering:optimizeLegibility;font-feature-settings:"cv02","cv03","cv04","cv11"}
+  a{color:var(--accent);text-decoration:none;transition:opacity .15s ease}
+  a:hover{opacity:.7}
+  ::selection{background:var(--accent-soft);color:var(--text)}
+
+  .wrap{max-width:720px;margin:0 auto;padding:80px 28px 120px}
+
+  /* hero */
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:20px}
+  .eyebrow::before{content:"";width:18px;height:1px;background:var(--text-muted)}
+  h1{font-size:44px;line-height:1.1;letter-spacing:-0.035em;font-weight:600;margin:0 0 18px}
+  .lede{font-size:19px;line-height:1.55;color:var(--text-2);font-weight:400;margin:0 0 8px;letter-spacing:-0.01em}
+  .lede strong{color:var(--text);font-weight:600}
+
+  /* toc */
+  nav.toc{margin:56px 0 0;padding:22px 24px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius)}
+  nav.toc .toc-label{font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px}
+  nav.toc ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 24px}
+  nav.toc ol li{font-size:14.5px;color:var(--text-2)}
+  nav.toc ol li a{color:var(--text-2);display:inline-flex;align-items:baseline;gap:10px}
+  nav.toc ol li a::before{content:counter(toc,decimal-leading-zero);font-family:var(--mono);font-size:11px;color:var(--text-muted);font-weight:500}
+  nav.toc ol{counter-reset:toc}
+  nav.toc ol li{counter-increment:toc}
+  nav.toc ol li a:hover{color:var(--accent);opacity:1}
+  @media (max-width:640px){nav.toc ol{grid-template-columns:1fr}}
+
+  /* section headings */
+  h2{font-size:28px;line-height:1.2;letter-spacing:-0.025em;font-weight:600;margin:72px 0 4px;padding-top:0}
+  h2 + .section-sub{color:var(--text-muted);font-size:15px;margin:0 0 28px;letter-spacing:-0.005em}
+  h3{font-size:18px;line-height:1.4;letter-spacing:-0.015em;font-weight:600;margin:36px 0 10px}
+
+  p{margin:14px 0;color:var(--text-2)}
+
+  /* code */
+  code{font-family:var(--mono);font-size:0.86em;background:var(--code-bg);padding:2px 6px;border-radius:4px;color:var(--text);letter-spacing:0;font-weight:500}
+  td code{font-size:0.84em;display:inline-block;max-width:100%;white-space:normal;word-break:break-word}
+
+  /* steps */
+  .steps{margin:32px 0 0;display:flex;flex-direction:column;gap:24px}
+  .step{display:grid;grid-template-columns:32px 1fr;gap:20px;padding:24px 0;border-top:1px solid var(--border)}
+  .step:first-child{border-top:none;padding-top:0}
+  .step .num{font-family:var(--mono);font-size:13px;color:var(--text-muted);font-weight:500;letter-spacing:0.04em;padding-top:2px}
+  .step h4{font-size:17px;line-height:1.4;font-weight:600;letter-spacing:-0.015em;margin:0 0 6px;color:var(--text)}
+  .step p{margin:6px 0;color:var(--text-2);font-size:15.5px}
+  .step figure{margin:18px 0 0}
+  figure{margin:0}
+  figure img{max-width:100%;height:auto;display:block;border-radius:var(--radius-sm);border:1px solid var(--border);box-shadow:0 1px 2px rgba(0,0,0,0.04),0 4px 12px rgba(0,0,0,0.04)}
+  figcaption{font-size:13px;color:var(--text-muted);margin-top:10px;letter-spacing:-0.005em}
+
+  /* tables */
+  .table-wrap{margin:20px 0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--bg)}
+  table{width:100%;border-collapse:collapse}
+  th,td{padding:14px 18px;text-align:left;vertical-align:top;font-size:14.5px;line-height:1.55}
+  th{background:var(--bg-subtle);font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border)}
+  tr + tr td{border-top:1px solid var(--border)}
+  td:first-child{color:var(--text);font-weight:500;width:34%}
+  td:last-child{color:var(--text-2)}
+
+  /* callout */
+  .callout{margin:24px 0;padding:18px 22px;background:var(--bg-subtle);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius)}
+  .callout.warn{background:var(--warn-bg);border-color:var(--warn-border);border-left-color:var(--warn-border)}
+  .callout.warn p{color:var(--warn-text)}
+  .callout p{margin:6px 0;font-size:14.5px}
+  .callout p:first-child{margin-top:0}
+  .callout p:last-child{margin-bottom:0}
+  .footer-attr{font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin:10px 0;color:var(--text-2);white-space:pre-wrap;line-height:1.6}
+
+  /* lists */
+  ul.clean,ol.clean{padding-left:0;list-style:none;margin:18px 0}
+  ul.clean li,ol.clean li{padding:10px 0;border-top:1px solid var(--border);font-size:15px;color:var(--text-2)}
+  ul.clean li:first-child,ol.clean li:first-child{border-top:none;padding-top:0}
+  ol.clean{counter-reset:item}
+  ol.clean li{counter-increment:item;display:grid;grid-template-columns:28px 1fr;gap:14px;align-items:start}
+  ol.clean li::before{content:counter(item,decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--text-muted);font-weight:500;padding-top:3px}
+  ol.clean li strong{color:var(--text);font-weight:600}
+  ol.clean li code{display:inline-block;margin-top:4px}
+
+  .limits-list li{display:grid;grid-template-columns:24px 1fr;gap:12px;align-items:start}
+  .limits-list .icon{font-family:var(--mono);font-size:13px;font-weight:600}
+  .limits-list .x{color:#dc2626}
+  .limits-list .w{color:#b45309}
+  .limits-list .i{color:var(--accent)}
+
+  /* support */
+  .support{margin:72px 0 0;padding:32px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius)}
+  .support h2{margin:0 0 6px;padding:0}
+  .support .section-sub{margin:0 0 20px}
+  .contact-card{display:inline-flex;align-items:center;gap:14px;padding:14px 18px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);transition:border-color .15s ease}
+  .contact-card:hover{border-color:var(--border-strong)}
+  .contact-card .icon{width:32px;height:32px;border-radius:8px;background:var(--discord);display:inline-flex;align-items:center;justify-content:center;color:#fff}
+  .contact-card .icon svg{width:18px;height:18px}
+  .contact-card .label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px}
+  .contact-card .handle{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--text)}
+
+  /* footer */
+  footer.meta{margin-top:96px;padding-top:28px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+
+  @media (max-width:640px){
+    .wrap{padding:48px 20px 80px}
+    h1{font-size:32px}
+    h2{font-size:22px;margin-top:56px}
+    .lede{font-size:17px}
+    .support{padding:24px}
+    th,td{padding:12px 14px;font-size:14px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Aiworks · Internal docs</div>
+  <h1>Discord-MCP 助理使用指引</h1>
+  <p class="lede">ChatGPT 多了一個 Discord 幫手,可以幫你整理 Discord 對話、找資訊、草擬回覆。</p>
+  <p class="lede"><strong>它只能看到你在 Discord 本來看得到的頻道。</strong>不會多、也不會少。</p>
+</header>
+
+<nav class="toc">
+  <div class="toc-label">目錄</div>
+  <ol>
+    <li><a href="#start">啟動指南</a></li>
+    <li><a href="#read">讀取功能</a></li>
+    <li><a href="#write">寫入功能</a></li>
+    <li><a href="#disconnect">解除連線</a></li>
+    <li><a href="#scenarios">使用情境</a></li>
+    <li><a href="#limits">限制</a></li>
+    <li><a href="#support">支援</a></li>
+  </ol>
+</nav>
+
+<section id="start">
+  <h2>啟動指南</h2>
+  <p class="section-sub">30 秒,一次設定終身用</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="num">01</div>
+      <div>
+        <h4>打開 ChatGPT,左側選單進入「應用程式」</h4>
+        <p>在應用程式列表找到 <strong>Discord-MCP</strong>(紫色 Discord logo,標記「內部」)。</p>
+        <figure>
+          <img src="images/onboarding-step1.png" alt="ChatGPT 應用程式頁面,Discord-MCP 在列表中" />
+          <figcaption>應用程式列表中找到 Discord-MCP</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="num">02</div>
+      <div>
+        <h4>點進去,按右上角「開始聊天」</h4>
+        <p>第一次使用會跳到 Discord 登入頁,選你的帳號 → 按 <strong>授權</strong>。</p>
+        <figure>
+          <img src="images/onboarding-step2.png" alt="Discord-MCP 應用程式詳細頁,右上角是開始聊天按鈕" />
+          <figcaption>右上角「開始聊天」按下去就會走 Discord 授權流程</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="num">03</div>
+      <div>
+        <h4>開新對話開始用 —— 寫入時會跳確認框</h4>
+        <p>授權後不會再跳登入。讀取動作直接執行;<strong>第一次發訊息</strong>會看到下面這個確認框 —— 按 <strong>確認</strong> 就送出。</p>
+        <figure>
+          <img src="images/onboarding-step3.png" alt="ChatGPT 寫入前的確認框,標題是 Validate Discord message before sending,有拒絕和確認兩個按鈕" />
+          <figcaption>寫入前的確認框:核對訊息內容沒問題,按「確認」送出</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="read">
+  <h2>讀取功能</h2>
+  <p class="section-sub">不會跳確認,直接執行</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>你想做</th><th>直接這樣打</th></tr></thead>
+      <tbody>
+        <tr><td>看有哪些可用的 Discord 伺服器</td><td><code>用 Discord-MCP 列出我的 Discord 伺服器</code></td></tr>
+        <tr><td>看某 server 的頻道</td><td><code>列出 Aiworks 團隊小空間 的所有頻道</code></td></tr>
+        <tr><td>整理某頻道近期討論</td><td><code>整理本週 #channel-name 的討論重點</code></td></tr>
+        <tr><td>找特定資訊</td><td><code>#channel-name 上次討論到 X 的結論是什麼?</code></td></tr>
+        <tr><td>跨頻道補進度</td><td><code>整理今天 #channel-A、#channel-B、#channel-C 的重點</code></td></tr>
+        <tr><td>看討論串</td><td><code>讀取 #channel-name 裡 [thread 名] 那個討論串</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="write">
+  <h2>寫入功能</h2>
+  <p class="section-sub">會跳一個確認框,避免誤送</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>你想做</th><th>直接這樣打</th></tr></thead>
+      <tbody>
+        <tr><td>發訊息</td><td><code>發訊息到 #channel-name:今天的會議改到 4 點</code></td></tr>
+        <tr><td>回覆某則訊息</td><td><code>回覆 [某則訊息]:收到,明天回你</code></td></tr>
+        <tr><td>只草擬不送</td><td><code>幫我草擬一則回覆放在 #channel-name,內容大概是 ...</code><br><span style="font-size:12.5px;color:var(--text-muted)">不要說「送出」就好</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <p><strong>送出的訊息會自動帶署名 footer:</strong></p>
+    <div class="footer-attr">— Sent via Aiworks Discord Agent
+Requested by: &lt;你的 Discord 名稱&gt;
+Source: ChatGPT Enterprise</div>
+    <p>不會偽裝成你本人發。內容含 <code>@everyone</code> / <code>@role</code> 也<strong>不會真的觸發通知</strong>。</p>
+  </div>
+</section>
+
+<section id="disconnect">
+  <h2>解除連線</h2>
+  <p class="section-sub">需要重置授權時</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>你想做</th><th>打</th></tr></thead>
+      <tbody>
+        <tr><td>解除 Discord 授權</td><td><code>斷開 Discord-MCP 連線</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="scenarios">
+  <h2>建議使用情境</h2>
+  <p class="section-sub">7 個高頻場景,看著抄</p>
+  <ol class="clean">
+    <li><div><strong>早上補進度</strong><br><code>整理昨天到今天 #channel-A、#channel-B、#channel-C 我可能要知道的重點</code></div></li>
+    <li><div><strong>會後同步</strong><br><code>整理今天 #standup 大家報告的進度,列出 action items</code></div></li>
+    <li><div><strong>新人融入第一週</strong><br><code>我是新人,從 #onboarding 跟 #general 幫我整理這週該知道的 5 件事</code></div></li>
+    <li><div><strong>追討論結論</strong><br><code>上次 #marketing 討論到 Q3 campaign 的最終決定是什麼?</code></div></li>
+    <li><div><strong>草擬訊息</strong><br><code>幫我草擬一則公告要發到 #announcement,提醒大家明天放颱風假</code></div></li>
+    <li><div><strong>積壓回覆</strong><br><code>#channel-name 最近有幾則 @我,幫我整理哪些重要、建議怎麼回</code></div></li>
+    <li><div><strong>找上下文</strong><br><code>這位同事剛提到 [關鍵字],他指的可能是哪份歷史討論?</code></div></li>
+  </ol>
+</section>
+
+<section id="limits">
+  <h2>限制</h2>
+  <p class="section-sub">先說好,避免誤會</p>
+  <ul class="clean limits-list">
+    <li><span class="icon x">×</span><div><strong>不能讀 DM</strong>(私人訊息)</div></li>
+    <li><span class="icon x">×</span><div><strong>不能搜尋整個 server</strong>,要指定頻道</div></li>
+    <li><span class="icon x">×</span><div><strong>不能看你 Discord 看不到的頻道</strong>(這是設計、不是 bug)</div></li>
+    <li><span class="icon w">!</span><div><strong>寫入訊息一定帶署名 footer</strong>,無法完全偽裝是你本人發</div></li>
+    <li><span class="icon w">!</span><div>第一次對特定資源動作時 ChatGPT 可能會跳確認框,按確認就好</div></li>
+    <li><span class="icon i">i</span><div><strong>看不到頻道內所有 thread 的清單</strong>,要直接點名是哪個 thread 或貼 thread 連結</div></li>
+  </ul>
+</section>
+
+<div class="support" id="support">
+  <h2>有問題找誰</h2>
+  <p class="section-sub">把錯誤訊息或截圖丟給我,後台 log 對得起來</p>
+  <a class="contact-card" href="https://discord.com/users/" onclick="return false">
+    <span class="icon">
+      <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20.317 4.369A19.791 19.791 0 0 0 16.558 3a14.96 14.96 0 0 0-.642 1.317 18.27 18.27 0 0 0-5.487 0A14.96 14.96 0 0 0 9.787 3a19.791 19.791 0 0 0-3.76 1.369C2.508 9.043 1.566 13.58 2.038 18.043a19.886 19.886 0 0 0 5.99 3.031 14.6 14.6 0 0 0 1.281-2.08 12.88 12.88 0 0 1-2.02-.972c.17-.124.336-.253.497-.387a14.207 14.207 0 0 0 12.43 0c.16.134.327.263.497.387a12.88 12.88 0 0 1-2.02.972 14.6 14.6 0 0 0 1.282 2.08 19.886 19.886 0 0 0 5.989-3.031c.555-5.166-.945-9.66-3.647-13.674zM8.673 15.255c-1.196 0-2.18-1.097-2.18-2.448 0-1.351.964-2.448 2.18-2.448 1.214 0 2.198 1.097 2.18 2.448-.001 1.351-.966 2.448-2.18 2.448zm6.654 0c-1.197 0-2.18-1.097-2.18-2.448 0-1.351.964-2.448 2.18-2.448 1.214 0 2.198 1.097 2.18 2.448 0 1.351-.966 2.448-2.18 2.448z"/></svg>
+    </span>
+    <div>
+      <div class="label">Discord</div>
+      <div class="handle">lamont_aiworks</div>
+    </div>
+  </a>
+</div>
+
+<footer class="meta">
+  <span>Discord-MCP 助理 · 內部工具</span>
+  <span>Aiworks</span>
+</footer>
+
+</div>
+</body>
+</html>

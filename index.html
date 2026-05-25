@@ -144,6 +144,11 @@
   .contact-card .label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px}
   .contact-card .handle{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--text)}
 
+  /* mermaid */
+  .mermaid-wrap{margin:24px 0 0;padding:28px 20px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius);overflow-x:auto}
+  .mermaid-wrap .mermaid{display:flex;justify-content:center;min-width:640px;font-family:var(--font)}
+  .mermaid-wrap .mermaid svg{max-width:100%;height:auto}
+
   /* footer */
   footer.meta{margin-top:96px;padding-top:28px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 
@@ -318,11 +323,69 @@ Source: ChatGPT Enterprise</div>
   </a>
 </div>
 
+<section id="flow">
+  <h2>授權流程</h2>
+  <p class="section-sub">底層怎麼運作 — 給好奇的人看</p>
+  <div class="mermaid-wrap">
+<pre class="mermaid">
+sequenceDiagram
+    participant U as 使用者
+    participant C as ChatGPT Connector
+    participant M as Discord MCP Server
+    participant D as Discord OAuth
+    participant A as Discord REST API
+    participant DB as Firestore
+
+    U->>C: 連接 Discord MCP
+    C->>M: /oauth/authorize&lt;br/&gt;PKCE + client_id
+    M->>DB: 建立 pending auth&lt;br/&gt;綁定 workspaceId + state
+    M-->>U: Redirect 到 Discord OAuth
+
+    U->>D: 用自己的 Discord 帳號登入並同意授權
+    D-->>M: /oauth/callback&lt;br/&gt;code + state
+
+    M->>D: exchange code
+    D-->>M: Discord user access token
+    M->>D: /users/@me
+    D-->>M: discordUserId / username
+
+    M->>DB: bind identity&lt;br/&gt;workspaceId + discordUserId&lt;br/&gt;加密儲存 Discord token
+    M-->>C: 回傳 MCP authorization code
+
+    C->>M: /oauth/token&lt;br/&gt;code + PKCE verifier
+    M->>DB: 建立 MCP session&lt;br/&gt;workspaceId + discordUserId
+    M-->>C: MCP access token&lt;br/&gt;綁定該 Discord user
+
+    C->>M: 呼叫 MCP tool&lt;br/&gt;Bearer MCP access token
+    M->>DB: resolve session&lt;br/&gt;還原 workspaceId + discordUserId
+
+    M->>A: 查 guild / channel / member / roles
+    A-->>M: Discord 即時權限資料
+
+    M->>M: 計算 user + bot effective permission
+
+    alt user 和 bot 都有權限
+        M->>A: 用 bot token 讀取或送出
+        A-->>M: 成功
+        M-->>C: 回傳結果
+    else 任一方沒權限
+        M-->>C: permission_denied
+    end
+</pre>
+  </div>
+</section>
+
 <footer class="meta">
   <span>Discord-MCP 助理 · 內部工具</span>
   <span>Aiworks</span>
 </footer>
 
 </div>
+
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'default', securityLevel: 'loose', fontFamily: 'Inter, -apple-system, sans-serif' });
+</script>
 </body>
 </html>

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Discord 助理 × Codex — 設定指南</title>
+<meta name="description" content="在 Codex（CLI / Desktop）用自然語言操作 Discord。同事自助設定 + IT 零設定下發。" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-subtle:#fafafa; --bg-elevated:#f7f7f8;
+    --text:#0a0a0a; --text-2:#3f3f46; --text-muted:#71717a;
+    --border:#e4e4e7; --border-strong:#d4d4d8;
+    --accent:#5e6ad2; --accent-soft:#eef0ff;
+    --warn-bg:#fff8e6; --warn-border:#f5d77a; --warn-text:#7a5b00;
+    --ok-bg:#ecfdf3; --ok-border:#a7e3c0; --ok-text:#1b6b3a;
+    --code-bg:#f4f4f5; --discord:#5865f2;
+    --radius:10px; --radius-sm:6px;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'PingFang TC','Noto Sans TC','Microsoft JhengHei',sans-serif;
+    --mono:'JetBrains Mono','SF Mono',Menlo,Monaco,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0c0c0d; --bg-subtle:#121214; --bg-elevated:#18181b;
+      --text:#fafafa; --text-2:#d4d4d8; --text-muted:#a1a1aa;
+      --border:#27272a; --border-strong:#3f3f46;
+      --accent:#8a93f0; --accent-soft:#1c1f3a;
+      --warn-bg:#2a2210; --warn-border:#5a4a1a; --warn-text:#f5d77a;
+      --ok-bg:#0f2417; --ok-border:#1f4d31; --ok-text:#7fe0a4;
+      --code-bg:#18181b;
+    }
+  }
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.65;letter-spacing:-0.005em}
+  a{color:var(--accent);text-decoration:none;transition:opacity .15s ease}
+  a:hover{opacity:.7}
+  ::selection{background:var(--accent-soft);color:var(--text)}
+  .wrap{max-width:720px;margin:0 auto;padding:80px 28px 120px}
+
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:20px}
+  .eyebrow::before{content:"";width:18px;height:1px;background:var(--text-muted)}
+  h1{font-size:42px;line-height:1.12;letter-spacing:-0.035em;font-weight:600;margin:0 0 18px}
+  .lede{font-size:18px;line-height:1.55;color:var(--text-2);font-weight:400;margin:0 0 8px;letter-spacing:-0.01em}
+  .lede strong{color:var(--text);font-weight:600}
+
+  h2{font-size:26px;line-height:1.2;letter-spacing:-0.025em;font-weight:600;margin:72px 0 4px}
+  h2 .tag{font-size:12px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:999px;vertical-align:middle;margin-left:10px;letter-spacing:0.02em}
+  h2 + .section-sub{color:var(--text-muted);font-size:15px;margin:6px 0 28px}
+  h3{font-size:17px;line-height:1.4;letter-spacing:-0.015em;font-weight:600;margin:32px 0 10px}
+  p{margin:14px 0;color:var(--text-2)}
+
+  code{font-family:var(--mono);font-size:0.86em;background:var(--code-bg);padding:2px 6px;border-radius:4px;color:var(--text);letter-spacing:0;font-weight:500}
+  pre{background:var(--code-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;overflow-x:auto;margin:14px 0;font-family:var(--mono);font-size:13.5px;line-height:1.6;color:var(--text)}
+  pre code{background:none;padding:0;font-size:inherit}
+
+  .steps{margin:28px 0 0;display:flex;flex-direction:column;gap:0}
+  .step{display:grid;grid-template-columns:32px 1fr;gap:20px;padding:26px 0;border-top:1px solid var(--border)}
+  .step:first-child{border-top:none;padding-top:4px}
+  .step .num{font-family:var(--mono);font-size:13px;color:var(--text-muted);font-weight:500;padding-top:2px}
+  .step h4{font-size:17px;line-height:1.4;font-weight:600;letter-spacing:-0.015em;margin:0 0 6px;color:var(--text)}
+  .step p{margin:6px 0;color:var(--text-2);font-size:15px}
+
+  .callout{margin:22px 0;padding:16px 20px;background:var(--bg-subtle);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius)}
+  .callout p{margin:6px 0;font-size:14.5px}
+  .callout p:first-child{margin-top:0}.callout p:last-child{margin-bottom:0}
+  .callout.warn{background:var(--warn-bg);border-color:var(--warn-border);border-left-color:var(--warn-border)}
+  .callout.warn p{color:var(--warn-text)}
+  .callout.ok{background:var(--ok-bg);border-color:var(--ok-border);border-left-color:var(--ok-border)}
+  .callout.ok p{color:var(--ok-text)}
+
+  ul.clean{padding-left:0;list-style:none;margin:16px 0}
+  ul.clean li{padding:10px 0;border-top:1px solid var(--border);font-size:15px;color:var(--text-2);display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start}
+  ul.clean li:first-child{border-top:none;padding-top:0}
+  ul.clean .ic{font-weight:700}
+  ul.clean .ok{color:var(--ok-text)} ul.clean .no{color:#dc2626} ul.clean .w{color:#b45309}
+
+  .divider{margin:80px 0 0;border:none;border-top:1px solid var(--border)}
+  footer.meta{margin-top:64px;padding-top:24px;border-top:1px solid var(--border);font-size:13px;color:var(--text-muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+  @media (max-width:640px){
+    .wrap{padding:48px 20px 80px} h1{font-size:30px} h2{font-size:21px;margin-top:56px} .lede{font-size:16px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Aiworks · Internal docs</div>
+  <h1>Discord 助理 × Codex 設定指南</h1>
+  <p class="lede">在 Codex（CLI 或 Desktop）用自然語言操作 Discord —— 整理討論、找資訊、草擬與發訊息。</p>
+  <p class="lede"><strong>設定一次,之後就用。它只能看到你在 Discord 本來看得到的頻道。</strong></p>
+</header>
+
+<section>
+  <h2>自己設定<span class="tag">約 2 分鐘</span></h2>
+  <p class="section-sub">需要先安裝好 Codex（CLI 或 Desktop 皆可,共用同一份設定）</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="num">01</div>
+      <div>
+        <h4>把 Discord 助理加進 Codex 設定</h4>
+        <p>打開「終端機 Terminal」,整段貼上後按 Enter（一次就好）：</p>
+        <pre><code>cat &gt;&gt; ~/.codex/config.toml &lt;&lt;'EOF'
+
+[mcp_servers.discord]
+url = "https://discord-mcp-415359812968.asia-east1.run.app/mcp"
+
+[mcp_servers.discord.oauth]
+client_id = "codex"
+EOF</code></pre>
+        <p style="font-size:13px;color:var(--text-muted)">這段把伺服器位址和登入用的 <code>client_id</code> 寫進你的 Codex 設定檔。<code>client_id = "codex"</code> 這行不能少。</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="num">02</div>
+      <div>
+        <h4>登入並授權 Discord</h4>
+        <p>在終端機執行：</p>
+        <pre><code>codex mcp login discord</code></pre>
+        <p>會自動開瀏覽器跳到 <strong>Discord 授權頁</strong> → 確認是你的帳號 → 按 <strong>授權</strong>。完成後終端機會顯示 <code>Successfully logged in to MCP server 'discord'.</code></p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="num">03</div>
+      <div>
+        <h4>開始用</h4>
+        <p>打開 Codex（CLI 打 <code>codex</code>,或開 Codex Desktop），直接用中文講：</p>
+        <pre><code>用 discord 列出我可以存取的伺服器
+整理 #某頻道 最近的討論重點
+發訊息到 #某頻道：今天會議改 4 點</code></pre>
+        <p style="font-size:13px;color:var(--text-muted)">用 Desktop 的話,加完設定要重開一次 Codex Desktop 才會載到。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <p><strong>就這樣,設定完成。</strong>授權只要做這一次,之後開 Codex 就能直接用。</p>
+  </div>
+
+  <h3>用之前先知道</h3>
+  <ul class="clean">
+    <li><span class="ic ok">✓</span><div><strong>只看得到你本來看得到的頻道</strong> —— 不多也不少（這是設計,不是 bug）。</div></li>
+    <li><span class="ic w">!</span><div><strong>發訊息會先跳確認框</strong>,避免誤送;送出的訊息會帶 Aiworks 署名,不會偽裝成你本人發。</div></li>
+    <li><span class="ic no">×</span><div>不能讀私訊（DM）;搜尋要指定頻道,不能整個 server 亂搜。</div></li>
+  </ul>
+
+  <div class="callout warn">
+    <p><strong>卡住了？</strong></p>
+    <p>登入時若出現 <code>Dynamic client registration not supported</code> 或登入失敗 —— 多半是 Step 01 的 <code>client_id = "codex"</code> 漏了或打錯。檢查 <code>~/.codex/config.toml</code> 裡 <code>[mcp_servers.discord.oauth]</code> 下面有沒有這行。</p>
+    <p>授權連結放超過 10 分鐘才按會過期,重跑一次 <code>codex mcp login discord</code> 即可。</p>
+  </div>
+</section>
+
+<hr class="divider" />
+
+<section>
+  <h2>給 IT / 系統管理員<span class="tag">零設定下發</span></h2>
+  <p class="section-sub">讓全公司同事「連設定都不用做」—— 需要 Codex Enterprise 管理員權限</p>
+
+  <p>上面的「自己設定」每人花 2 分鐘即可。若要規模化、讓同事<strong>完全不碰設定檔</strong>,可由管理員在 Codex Enterprise 後台統一託管。</p>
+
+  <h3>怎麼做</h3>
+  <ul class="clean">
+    <li><span class="ic ok">1</span><div>以 <strong>Codex admin</strong> 身分進入 <code>chatgpt.com/codex/settings/managed-configs</code>（即 Codex 後台的「政策和組態 / Policies」）。非 admin 會看到「Only Codex admins can view policies」。</div></li>
+    <li><span class="ic ok">2</span><div>在託管的 <code>requirements.toml</code> 的 <code>[mcp_servers]</code> 加入 Discord 助理,並可指定套用到哪些 user group：
+      <pre style="margin-top:10px"><code>[mcp_servers.discord]
+identity = { url = "https://discord-mcp-415359812968.asia-east1.run.app/mcp" }</code></pre>
+    </div></li>
+    <li><span class="ic ok">3</span><div>下發後,同事的 Codex 就會帶到這台 server,省去「自己設定」那步。</div></li>
+  </ul>
+
+  <div class="callout warn">
+    <p><strong>上線前先 pilot 驗一個人。</strong></p>
+    <p>官方文件對託管設定的定位偏「<strong>allowlist / 政策</strong>」（控制同事可啟用哪些 server,以 <code>url</code> 比對）。它<strong>是否會一併下發本服務需要的 <code>oauth.client_id = "codex"</code></strong> 尚未在公開文件明確說明。請先用一個同事測:他若不用自己補 <code>client_id</code> 就能登入 = 真正零設定可全推;若仍需補,就退回上面的「自己設定」2 分鐘版,或將 client 設定一併納入託管。</p>
+  </div>
+
+  <div class="callout">
+    <p><strong>無論哪種方式,每位同事第一次都要點一次 Discord 授權</strong>（綁定個人身分,跟 ChatGPT 端一樣,免不了）。admin 託管省掉的是「設定檔」,不是「授權」。</p>
+  </div>
+</section>
+
+<footer class="meta">
+  <span>Discord 助理 × Codex · 內部設定指南</span>
+  <span>Aiworks</span>
+</footer>
+
+</div>
+</body>
+</html>

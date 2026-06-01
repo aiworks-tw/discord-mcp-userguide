@@ -1,0 +1,240 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1450" viewBox="0 0 2200 1450">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+    <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+  </marker>
+  <filter id="shadow" x="-15%" y="-15%" width="130%" height="130%">
+    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.16"/>
+  </filter>
+  <style>
+    .title { font: 800 44px 'Noto Sans CJK TC','Microsoft JhengHei','PingFang TC','Arial Unicode MS',Arial,sans-serif; fill:#0f172a; }
+    .subtitle { font: 400 22px 'Noto Sans CJK TC','Microsoft JhengHei','PingFang TC','Arial Unicode MS',Arial,sans-serif; fill:#475569; }
+    .section { font: 800 24px 'Noto Sans CJK TC','Microsoft JhengHei','PingFang TC','Arial Unicode MS',Arial,sans-serif; fill:#0f172a; }
+    .boxTitle { font: 800 21px 'Noto Sans CJK TC','Microsoft JhengHei','PingFang TC','Arial Unicode MS',Arial,sans-serif; fill:#0f172a; }
+    .body { font: 400 17px 'Noto Sans CJK TC','Microsoft JhengHei','PingFang TC','Arial Unicode MS',Arial,sans-serif; fill:#334155; }
+    .small { font: 400 15px 'Noto Sans CJK TC','Microsoft JhengHei','PingFang TC','Arial Unicode MS',Arial,sans-serif; fill:#475569; }
+    .num { font: 800 16px Arial,sans-serif; fill:white; }
+    .arrowLabel { font: 600 15px 'Noto Sans CJK TC','Microsoft JhengHei','PingFang TC','Arial Unicode MS',Arial,sans-serif; fill:#334155; }
+  </style>
+</defs>
+<rect width="100%" height="100%" fill="#f8fafc"/>
+
+<text x="70" y="74" class="title" text-anchor="start">Discord MCP v2｜整體架構圖</text>
+<text x="72" y="112" class="subtitle" text-anchor="start">ChatGPT Enterprise ↔ Cloud Run Remote MCP Server ↔ Discord REST API；GCP 負責狀態、密鑰與稽核資料。</text>
+<rect x="60" y="190" width="330" height="430" rx="28" fill="#ffffff" stroke="#94a3b8" stroke-width="2"/>
+<text x="88" y="228" class="section" text-anchor="start">Client</text>
+<rect x="95" y="270" width="260" height="105" rx="18" fill="#fff" stroke="#64748b" stroke-width="2" filter="url(#shadow)"/>
+<text x="225.0" y="304" class="boxTitle" text-anchor="middle">
+<tspan x="225.0" dy="0">使用者</tspan>
+</text>
+<text x="225.0" y="336" class="body" text-anchor="middle">
+<tspan x="225.0" dy="0">Discord 讀取 / 寫入請求</tspan>
+</text>
+<rect x="95" y="440" width="260" height="120" rx="18" fill="#fff" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
+<text x="225.0" y="474" class="boxTitle" text-anchor="middle">
+<tspan x="225.0" dy="0">ChatGPT Enterprise</tspan>
+</text>
+<text x="225.0" y="506" class="body" text-anchor="middle">
+<tspan x="225.0" dy="0">Internal MCP Connector</tspan>
+<tspan x="225.0" dy="22">OAuth 2.1 + MCP HTTP</tspan>
+</text>
+<line x1="225" y1="375" x2="225" y2="440" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<rect x="460" y="165" width="1000" height="850" rx="28" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+<text x="488" y="203" class="section" text-anchor="start">Google Cloud Run：discord-mcp-v2</text>
+<rect x="515" y="245" width="890" height="100" rx="18" fill="#fff" stroke="#2563eb" stroke-width="2" filter="url(#shadow)"/>
+<text x="960.0" y="279" class="boxTitle" text-anchor="middle">
+<tspan x="960.0" dy="0">HTTP Entry</tspan>
+</text>
+<text x="960.0" y="311" class="body" text-anchor="middle">
+<tspan x="960.0" dy="0">Node.js 22 / TypeScript</tspan>
+<tspan x="960.0" dy="22">/mcp → MCP handler；其他 route → Hono</tspan>
+</text>
+<rect x="515" y="405" width="280" height="120" rx="18" fill="#fff" stroke="#0ea5e9" stroke-width="2" filter="url(#shadow)"/>
+<text x="655.0" y="439" class="boxTitle" text-anchor="middle">
+<tspan x="655.0" dy="0">Hono OAuth Routes</tspan>
+</text>
+<text x="655.0" y="471" class="body" text-anchor="middle">
+<tspan x="655.0" dy="0">/oauth/authorize</tspan>
+<tspan x="655.0" dy="22">/oauth/token / callback</tspan>
+</text>
+<rect x="850" y="405" width="280" height="120" rx="18" fill="#fff" stroke="#0ea5e9" stroke-width="2" filter="url(#shadow)"/>
+<text x="990.0" y="439" class="boxTitle" text-anchor="middle">
+<tspan x="990.0" dy="0">MCP Handler</tspan>
+</text>
+<text x="990.0" y="471" class="body" text-anchor="middle">
+<tspan x="990.0" dy="0">Bearer token 驗證</tspan>
+<tspan x="990.0" dy="22">Streamable HTTP</tspan>
+</text>
+<rect x="1185" y="405" width="220" height="120" rx="18" fill="#fff" stroke="#0ea5e9" stroke-width="2" filter="url(#shadow)"/>
+<text x="1295.0" y="439" class="boxTitle" text-anchor="middle">
+<tspan x="1295.0" dy="0">Discovery / Health</tspan>
+</text>
+<text x="1295.0" y="471" class="body" text-anchor="middle">
+<tspan x="1295.0" dy="0">.well-known</tspan>
+<tspan x="1295.0" dy="22">/health</tspan>
+</text>
+<rect x="515" y="585" width="280" height="120" rx="18" fill="#fff" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
+<text x="655.0" y="619" class="boxTitle" text-anchor="middle">
+<tspan x="655.0" dy="0">Session / Tenant</tspan>
+</text>
+<text x="655.0" y="651" class="body" text-anchor="middle">
+<tspan x="655.0" dy="0">workspace + Discord user</tspan>
+<tspan x="655.0" dy="22">只從 session 解析</tspan>
+</text>
+<rect x="850" y="585" width="280" height="120" rx="18" fill="#fff" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
+<text x="990.0" y="619" class="boxTitle" text-anchor="middle">
+<tspan x="990.0" dy="0">MCP Tools</tspan>
+</text>
+<text x="990.0" y="651" class="body" text-anchor="middle">
+<tspan x="990.0" dy="0">read tools</tspan>
+<tspan x="990.0" dy="22">prepare / send / reply</tspan>
+</text>
+<rect x="1185" y="585" width="220" height="120" rx="18" fill="#fff" stroke="#0f766e" stroke-width="2" filter="url(#shadow)"/>
+<text x="1295.0" y="619" class="boxTitle" text-anchor="middle">
+<tspan x="1295.0" dy="0">Identity Lifecycle</tspan>
+</text>
+<text x="1295.0" y="651" class="body" text-anchor="middle">
+<tspan x="1295.0" dy="0">Discord token refresh</tspan>
+<tspan x="1295.0" dy="22">disconnect</tspan>
+</text>
+<rect x="515" y="765" width="280" height="120" rx="18" fill="#fff" stroke="#16a34a" stroke-width="2" filter="url(#shadow)"/>
+<text x="655.0" y="799" class="boxTitle" text-anchor="middle">
+<tspan x="655.0" dy="0">Permission Engine</tspan>
+</text>
+<text x="655.0" y="831" class="body" text-anchor="middle">
+<tspan x="655.0" dy="0">guild allowlist</tspan>
+<tspan x="655.0" dy="22">user + bot 權限</tspan>
+</text>
+<rect x="850" y="765" width="280" height="120" rx="18" fill="#fff" stroke="#16a34a" stroke-width="2" filter="url(#shadow)"/>
+<text x="990.0" y="799" class="boxTitle" text-anchor="middle">
+<tspan x="990.0" dy="0">Discord REST Client</tspan>
+</text>
+<text x="990.0" y="831" class="body" text-anchor="middle">
+<tspan x="990.0" dy="0">rate limit / retry</tspan>
+<tspan x="990.0" dy="22">Bot token calls</tspan>
+</text>
+<rect x="1185" y="765" width="220" height="120" rx="18" fill="#fff" stroke="#16a34a" stroke-width="2" filter="url(#shadow)"/>
+<text x="1295.0" y="799" class="boxTitle" text-anchor="middle">
+<tspan x="1295.0" dy="0">Write Safety</tspan>
+</text>
+<text x="1295.0" y="831" class="body" text-anchor="middle">
+<tspan x="1295.0" dy="0">confirmation token</tspan>
+<tspan x="1295.0" dy="22">nonce state machine</tspan>
+</text>
+<rect x="515" y="925" width="280" height="70" rx="18" fill="#fff" stroke="#f97316" stroke-width="2" filter="url(#shadow)"/>
+<text x="655.0" y="959" class="boxTitle" text-anchor="middle">
+<tspan x="655.0" dy="0">Audit Logger</tspan>
+</text>
+<text x="655.0" y="991" class="body" text-anchor="middle">
+<tspan x="655.0" dy="0">success / failure + HMAC</tspan>
+</text>
+<rect x="850" y="925" width="280" height="70" rx="18" fill="#fff" stroke="#f97316" stroke-width="2" filter="url(#shadow)"/>
+<text x="990.0" y="959" class="boxTitle" text-anchor="middle">
+<tspan x="990.0" dy="0">Crypto</tspan>
+</text>
+<text x="990.0" y="991" class="body" text-anchor="middle">
+<tspan x="990.0" dy="0">HMAC + KMS envelope</tspan>
+</text>
+<rect x="1185" y="925" width="220" height="70" rx="18" fill="#fff" stroke="#f97316" stroke-width="2" filter="url(#shadow)"/>
+<text x="1295.0" y="959" class="boxTitle" text-anchor="middle">
+<tspan x="1295.0" dy="0">Config</tspan>
+</text>
+<text x="1295.0" y="991" class="body" text-anchor="middle">
+<tspan x="1295.0" dy="0">Secret-injected env</tspan>
+</text>
+<rect x="1540" y="190" width="600" height="520" rx="28" fill="#f5f3ff" stroke="#a78bfa" stroke-width="2"/>
+<text x="1568" y="228" class="section" text-anchor="start">Discord</text>
+<rect x="1600" y="275" width="480" height="105" rx="18" fill="#fff" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+<text x="1840.0" y="309" class="boxTitle" text-anchor="middle">
+<tspan x="1840.0" dy="0">Discord OAuth</tspan>
+</text>
+<text x="1840.0" y="341" class="body" text-anchor="middle">
+<tspan x="1840.0" dy="0">授權使用者 Discord identity</tspan>
+<tspan x="1840.0" dy="22">server 取得 access / refresh token</tspan>
+</text>
+<rect x="1600" y="450" width="480" height="120" rx="18" fill="#fff" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+<text x="1840.0" y="484" class="boxTitle" text-anchor="middle">
+<tspan x="1840.0" dy="0">Discord REST API v10</tspan>
+</text>
+<text x="1840.0" y="516" class="body" text-anchor="middle">
+<tspan x="1840.0" dy="0">GET guild/member/channel/messages</tspan>
+<tspan x="1840.0" dy="22">POST channel messages</tspan>
+</text>
+<rect x="1600" y="620" width="480" height="70" rx="18" fill="#fff" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
+<text x="1840.0" y="654" class="boxTitle" text-anchor="middle">
+<tspan x="1840.0" dy="0">Guilds / Channels / Threads / Messages</tspan>
+</text>
+<text x="1840.0" y="686" class="body" text-anchor="middle">
+<tspan x="1840.0" dy="0">實際 Discord 資料來源與訊息目的地</tspan>
+</text>
+<rect x="460" y="1080" width="1680" height="260" rx="28" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+<text x="488" y="1118" class="section" text-anchor="start">GCP Managed Services</text>
+<rect x="510" y="1160" width="360" height="110" rx="18" fill="#fff" stroke="#64748b" stroke-width="2" filter="url(#shadow)"/>
+<text x="690.0" y="1194" class="boxTitle" text-anchor="middle">
+<tspan x="690.0" dy="0">Firestore</tspan>
+</text>
+<text x="690.0" y="1226" class="body" text-anchor="middle">
+<tspan x="690.0" dy="0">identities / mcp_sessions</tspan>
+<tspan x="690.0" dy="22">oauth_* / nonces / audit_logs / allowlist</tspan>
+</text>
+<rect x="925" y="1160" width="300" height="110" rx="18" fill="#fff" stroke="#64748b" stroke-width="2" filter="url(#shadow)"/>
+<text x="1075.0" y="1194" class="boxTitle" text-anchor="middle">
+<tspan x="1075.0" dy="0">Cloud KMS</tspan>
+</text>
+<text x="1075.0" y="1226" class="body" text-anchor="middle">
+<tspan x="1075.0" dy="0">包住 Discord token</tspan>
+<tspan x="1075.0" dy="22">envelope encryption</tspan>
+</text>
+<rect x="1280" y="1160" width="300" height="110" rx="18" fill="#fff" stroke="#64748b" stroke-width="2" filter="url(#shadow)"/>
+<text x="1430.0" y="1194" class="boxTitle" text-anchor="middle">
+<tspan x="1430.0" dy="0">Secret Manager</tspan>
+</text>
+<text x="1430.0" y="1226" class="body" text-anchor="middle">
+<tspan x="1430.0" dy="0">Discord client secret</tspan>
+<tspan x="1430.0" dy="22">Bot token / HMAC key</tspan>
+</text>
+<rect x="1635" y="1160" width="300" height="110" rx="18" fill="#fff" stroke="#64748b" stroke-width="2" filter="url(#shadow)"/>
+<text x="1785.0" y="1194" class="boxTitle" text-anchor="middle">
+<tspan x="1785.0" dy="0">Cloud Logging</tspan>
+</text>
+<text x="1785.0" y="1226" class="body" text-anchor="middle">
+<tspan x="1785.0" dy="0">operational logs</tspan>
+<tspan x="1785.0" dy="22">不記 raw content / token</tspan>
+</text>
+<polyline points="390,500 430,500 430,295 515,295" fill="none" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="430" y="287" class="arrowLabel" text-anchor="middle">OAuth / MCP</text>
+<line x1="1405" y1="295" x2="1600" y2="328" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="1502.5" y="303.5" class="arrowLabel" text-anchor="middle">OAuth redirect</text>
+<polyline points="1600,328 1500,328 1500,465 795,465" fill="none" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="1500" y="457" class="arrowLabel" text-anchor="middle">callback</text>
+<line x1="990" y1="525" x2="990" y2="585" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<line x1="990" y1="705" x2="990" y2="765" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<line x1="1130" y1="825" x2="1600" y2="510" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="1365.0" y="659.5" class="arrowLabel" text-anchor="middle">REST</text>
+<line x1="1840" y1="570" x2="1840" y2="620" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<line x1="655" y1="995" x2="690" y2="1160" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="672.5" y="1069.5" class="arrowLabel" text-anchor="middle">state / audit</text>
+<line x1="990" y1="995" x2="1075" y2="1160" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="1032.5" y="1069.5" class="arrowLabel" text-anchor="middle">wrap / unwrap</text>
+<line x1="1295" y1="995" x2="1430" y2="1160" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="1362.5" y="1069.5" class="arrowLabel" text-anchor="middle">secrets</text>
+<polyline points="1270,995 1270,1040 1785,1040 1785,1160" fill="none" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<text x="1785" y="1032" class="arrowLabel" text-anchor="middle">logs</text>
+<line x1="655" y1="525" x2="655" y2="585" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<line x1="655" y1="705" x2="655" y2="765" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<line x1="990" y1="345" x2="990" y2="405" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<line x1="655" y1="345" x2="655" y2="405" stroke="#1f2937" stroke-width="2.8" marker-end="url(#arrow)"/>
+<rect x="1540" y="770" width="600" height="245" rx="24" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+<text x="1585" y="825" class="section" text-anchor="start">核心安全邊界</text>
+<text x="1840" y="870" class="body" text-anchor="middle">
+<tspan x="1840" dy="0">1. tenant 只從 MCP session 解析</tspan>
+<tspan x="1840" dy="30">2. guild 必須 allowlisted</tspan>
+<tspan x="1840" dy="30">3. user 與 bot 都要有 Discord 權限</tspan>
+<tspan x="1840" dy="30">4. 寫入必須 confirmation token + nonce</tspan>
+<tspan x="1840" dy="30">5. audit 只存 HMAC，不存 raw message</tspan>
+</text>
+<rect x="60" y="1370" width="2080" height="55" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1100" y="1405" class="body" text-anchor="middle">
+<tspan x="1100" dy="0">架構重點：REST-only Discord bot；Cloud Run stateless；Firestore 保存 session / nonce / audit / allowlist；KMS 與 Secret Manager 處理敏感資料。</tspan>
+</text>
+</svg>

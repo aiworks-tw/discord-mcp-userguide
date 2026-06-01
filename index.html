@@ -241,6 +241,7 @@
         <tr><td>找特定資訊</td><td><code>#channel-name 上次討論到 X 的結論是什麼?</code></td></tr>
         <tr><td>跨頻道補進度</td><td><code>整理今天 #channel-A、#channel-B、#channel-C 的重點</code></td></tr>
         <tr><td>看討論串</td><td><code>讀取 #channel-name 裡 [thread 名] 那個討論串</code></td></tr>
+        <tr><td>看最近有誰 @ 我</td><td><code>整理過去 24 小時有人 @ 我的訊息,哪些重要、建議怎麼回</code></td></tr>
       </tbody>
     </table>
   </div>
@@ -374,6 +375,20 @@ sequenceDiagram
 </pre>
   </div>
 </section>
+
+<section id="architecture">
+  <h2>系統架構</h2>
+  <p class="section-sub">整體元件與資料流 — 點圖可看完整大圖</p>
+  <figure>
+    <a href="images/architecture.svg" target="_blank" rel="noopener">
+      <img src="images/architecture.svg" alt="Discord-MCP v2 系統架構圖" />
+    </a>
+  </figure>
+</section>
+
+<div class="callout" style="margin-top:48px">
+  <p><strong>用 Codex(CLI / Desktop)?</strong> 設定方式看這頁 → <a href="codex-setup.html">Discord 助理 × Codex 設定指南</a></p>
+</div>
 
 <footer class="meta">
   <span>Discord-MCP 助理 · 內部工具</span>
